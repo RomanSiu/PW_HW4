@@ -70,6 +70,8 @@ def echo_server(host, port):
                 print(f"Connected by {addr}")
                 with open("storage/data.json", "r") as fh:
                     data_lst = json.load(fh)
+                    if not data_lst:
+                        data_lst = []
                 with conn:
                     while True:
                         data = conn.recv(1024)
