@@ -69,9 +69,10 @@ def echo_server(host, port):
                 conn, addr = s.accept()
                 print(f"Connected by {addr}")
                 with open("storage/data.json", "r") as fh:
-                    data_lst = json.load(fh)
-                    if not data_lst:
-                        data_lst = []
+                    try:
+                        data_lst = json.load(fh)
+                    except json.decoder.JSONDecodeError:
+                        data_lst = {}
                 with conn:
                     while True:
                         data = conn.recv(1024)
@@ -81,9 +82,9 @@ def echo_server(host, port):
                         data_parse = urllib.parse.unquote_plus(data.decode())
                         time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                         data_dict = {time:{key: value for key, value in [el.split('=') for el in data_parse.split('&')]}}
-                        data_lst.append(data_dict)
+                        data_lst.update(data_dict)
                 with open("storage/data.json", "w") as fh:
-                    json.dump(data_lst, fh)
+                    json.dump(data_lst, fh, indent=4)
         except KeyboardInterrupt:
             print(f'Destroy server')
 
